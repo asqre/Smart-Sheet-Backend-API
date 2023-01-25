@@ -1,0 +1,73 @@
+//first install the proto compiler
+//NOTE: must use everywhere UpperCamel
+//1st we tell compiler that we are using proto3 version
+syntax="proto3";
+
+//now, give package name to identify the package
+package model; //package name must be equal to the file name
+
+//Include below line code to every proto file
+option go_package = "./";
+
+//now create a structure of student-data and file detail
+//we can create structure like message
+message FileDetail {
+  string FileName=1;
+  string LocalFileName=2;
+  string FileSize=3;
+  string FilePath=4;
+}
+
+message StudentData{
+  string Id =1;
+  string StudentName=2;
+  string StudentEmailAddress=3;
+  FileDetail File=4;
+  int64 TimeStamp=5;
+}
+
+//create StudentDataArray message/structure to take returns in GetSubmissionByIds
+message StudentDataArray{
+  repeated string NoOfStudentsInfo=1;
+}
+
+message StudentId{
+  string Id=1;
+}
+
+message Url{
+  string Url=1;
+}
+
+message StudentIdArray{
+  repeated string NoOfId=1; //declare array of string using repeated keyword
+}
+//Creating return response message/structure
+message Response{
+  string Message=1;
+}
+
+message Empty{
+}
+
+// creating urgent message to return counterintelligence
+message UrlCnt{
+  int64 CntUrl=1; //normally, take int64 in golang
+}
+
+//now create services(OR  function )
+//1st naming the services
+service API {
+  //now , tells the API,which function can be call
+  rpc AddSubmission (StudentData) returns (Response); //in AddSubmission,receive studentData.so, put it into bracket and returns some information
+  rpc GetSubmissionById (StudentId) returns (StudentData);
+  rpc GetAllSubmissionByIds (StudentIdArray) returns (StudentDataArray);
+  rpc GetAllSubmissions (Empty) returns (StudentDataArray);//as this API,does not take any request so,we create Empty message to receive request
+  rpc UpdateSubmissionById (StudentData) returns (StudentData);
+  rpc DeleteSubmissionById (StudentId) returns (Response);
+  rpc GetUrlRequestCounter (Url) returns (UrlCnt); //this API take url request and return
+}
+
+//Always run below code in terminal whenever you write something  or edit in proto file. coz,we running this command we get two auto generated file having extension .pb.go and _grpc.pb.go ,from these file , we call function
+// protoc --go_out=. --go_opt=paths=source_relative     --go-grpc_out=. --go-grpc_opt=paths=source_relative     model/model.proto
+//Also, we create one go file(main.go) in root folder
